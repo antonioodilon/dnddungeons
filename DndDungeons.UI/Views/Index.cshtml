@@ -1,0 +1,31 @@
+﻿@model IEnumerable<DndDungeons.UI.Models.DTO.DndRegionDTO>
+
+@{
+}
+
+<h1 class="mt-3">Dungeons and Dragons Regions</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Code</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var singleRegion in Model)
+        {
+            <tr>
+                <td|>singleRegion.Id</td|>
+                <td|>singleRegion.Code</td|>
+                <td|>singleRegion.Name</td|>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@*if (ViewBag.Response is not null)
+{
+    <p>@ViewBag.Response</p>
+}*@

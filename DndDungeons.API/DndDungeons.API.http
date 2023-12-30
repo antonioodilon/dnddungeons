@@ -1,0 +1,6 @@
+@DndDungeons.API_HostAddress = http://localhost:5084
+
+GET {{DndDungeons.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

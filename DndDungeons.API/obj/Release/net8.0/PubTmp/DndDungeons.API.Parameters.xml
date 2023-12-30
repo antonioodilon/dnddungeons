@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="IIS Web Application Name" description="" value="app-dnddungeons-brazil-dev-001" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\anton\\Antonio\\a_programming\\asp_dotnet_udemy\\DndDungeons\\DndDungeons\.API\\DndDungeons\.API\\obj\\Release\\net8\.0\\PubTmp\\Out\\$" />
+  </parameter>
+  <parameter name="DndDungeons.API.Data.DndDungeonsAuthDbContext" description="" value="Data Source=sqlserver-dnddungeons-brazil-dev-001.database.windows.net,1433;Initial Catalog=sqldb-dnddungeons-brazil-dev-001;User ID=dnddungeonsmanagerantonio;Password=Aobmf39410086161!" tags="dbfullsql">
+    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^C:\\Users\\anton\\Antonio\\a_programming\\asp_dotnet_udemy\\DndDungeons\\DndDungeons\.API\\DndDungeons\.API\\obj\\Release\\net8\.0\\PubTmp\\EFSQLScripts\\DndDungeons\.API\.Data\.DndDungeonsAuthDbContext\.sql$" />
+  </parameter>
+  <parameter name="DndDungeons.API.Data.DndDungeonsDbContext" description="" value="Data Source=sqlserver-dnddungeons-brazil-dev-001.database.windows.net,1433;Initial Catalog=sqldb-dnddungeons-brazil-dev-001;User ID=dnddungeonsmanagerantonio;Password=Aobmf39410086161!" tags="dbfullsql">
+    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^C:\\Users\\anton\\Antonio\\a_programming\\asp_dotnet_udemy\\DndDungeons\\DndDungeons\.API\\DndDungeons\.API\\obj\\Release\\net8\.0\\PubTmp\\EFSQLScripts\\DndDungeons\.API\.Data\.DndDungeonsDbContext\.sql$" />
+  </parameter>
+</parameters>

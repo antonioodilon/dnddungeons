@@ -1,0 +1,189 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NZWalks.API.Data;
+using NZWalks.API.Models.Domain;
+using NZWalks.API.Models.DTO;
+using NZWalks.API.OtherFunctions;
+using NZWalks.API.Repositories;
+using NZWalks.API.Mappings;
+using AutoMapper;
+
+
+namespace NZWalks.API.Controllers
+{
+    // /api/walks
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WalksController : ControllerBase
+    {
+        private readonly NZWalksDbContext _dbContext;
+        private readonly IWalkRepository _walkRepository;
+        private readonly IMapper _mapper;
+
+        public WalksController(NZWalksDbContext dbContext, IWalkRepository walkRepository, IMapper mapper)
+        {
+            this._dbContext = dbContext;
+            this._walkRepository = walkRepository;
+            this._mapper = mapper;
+        }
+
+        // GETALL Walk
+        [HttpGet]
+        public async Task<IActionResult> GetAllWalks()
+        {
+            List<Walk> listWalks = await _walkRepository.GetAllAsync();
+            /*WalkDTO walk1 = new WalkDTO();
+            WalkDTO walk2 = new WalkDTO();
+            WalkDTO walk3 = new WalkDTO();
+            walk1.Id = new Guid();
+            walk1.Name = "Name1";
+            walk2.Id = new Guid();
+            walk2.Name = "Name2";
+            walk3.Id = new Guid();
+            walk3.Name = "Name3";*/
+
+            // Map Domain models to DTO:
+            List<WalkDTO> listWalksDTO = new List<WalkDTO>();
+
+            _mapper.Map(listWalks, listWalksDTO);
+            // No need to do what is below! ASP.NET is smart enough to map it for us once we create an
+            // automapper for Region and RegionDTO, as well as Difficulty and DifficultyDTO
+            /*for (int i = 0; i < listWalksDTO.Count; ++i)
+            {
+                _mapper.Map(listWalks[i].Difficulty, listWalksDTO[i].Difficulty);
+                _mapper.Map(listWalks[i].Region, listWalksDTO[i].Region);
+            }*/
+
+            //listWalksDTO.Add(walk1);
+            //listWalksDTO.Add(walk2);
+            //listWalksDTO.Add(walk3);
+
+            return Ok(listWalksDTO);
+        }
+
+        // GET Walk
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetSingleWalk([FromRoute] Guid id)
+        {
+            Walk walkToFind = await _walkRepository.GetWalkByIdAsync(id);
+            if (walkToFind == null)
+            {
+                return NotFound();
+            }
+
+            // Map/Convert Domain model to DTO:
+            WalkDTO walkDTO = new WalkDTO();
+            _mapper.Map(walkToFind, walkDTO);
+            //_mapper.Map(walkToFind.Difficulty, walkDTO.Difficulty);
+            //_mapper.Map(walkToFind.Region, walkDTO.Region);
+
+            return Ok(walkDTO);
+        }
+
+        // CREATE Walk
+        // POST: /api/walks
+        [HttpPost]
+        public async Task<IActionResult> CreateWalk([FromBody] AddWalkRequestDTO newWalkRequestDTO)
+        {
+            // Map or convert DTO to domain model:
+            Walk walkDomainModel = new Walk();
+            walkDomainModel.Name = newWalkRequestDTO.Name;
+            walkDomainModel.Description = newWalkRequestDTO.Description;
+            walkDomainModel.LengthInKm = newWalkRequestDTO.LengthInKm;
+            walkDomainModel.WalkImageUrl = newWalkRequestDTO.WalkImageUrl;
+            walkDomainModel.DifficultyId = newWalkRequestDTO.DifficultyId;
+            walkDomainModel.RegionId = newWalkRequestDTO.RegionId;
+
+            // Check if the Difficulty exists:
+            List<Difficulty> difficultiesList = _dbContext.Difficulties.ToList();
+            bool foundDifficulty = false;
+            for (int i = 0; i < difficultiesList.Count; i++)
+            {
+                if (walkDomainModel.DifficultyId == difficultiesList[i].Id)
+                {
+                    walkDomainModel.Difficulty = difficultiesList[i];
+                    foundDifficulty = true;
+                    break;
+                }
+            }
+
+            if (foundDifficulty == false)
+            {
+                return NotFound();
+            }
+
+            // Check if the Region exists:
+            List<Region> regionsList = _dbContext.Regions.ToList();
+            bool foundRegion = false;
+            for (int i = 0; i < regionsList.Count; i++)
+            {
+                if (walkDomainModel.RegionId == regionsList[i].Id)
+                {
+                    walkDomainModel.Region = regionsList[i];
+                    foundRegion = true;
+                    break;
+                }
+            }
+
+            if (foundRegion == false)
+            {
+                return NotFound();
+            }
+
+            // Add new Walk to the database and save changes:
+            await _dbContext.Walks.AddAsync(walkDomainModel);
+            _dbContext.SaveChangesAsync();
+            // Change to DTO!
+            WalkDTO walkDTOreturn = new WalkDTO();
+            _mapper.Map(walkDomainModel, walkDTOreturn);
+            //_mapper.Map(walkDomainModel.Difficulty, walkDTOreturn.Difficulty);
+            //_mapper.Map(walkDomainModel.Region, walkDTOreturn.Region);
+
+            string actionNameString = nameof(GetSingleWalk);
+            return CreatedAtAction(actionNameString, new { id = walkDTOreturn.Id}, walkDTOreturn);
+        }
+
+        // UPDATE Walk7
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateWalk([FromBody] UpdateWalkRequestDTO walkToUpdateDTO, Guid id)
+        {
+            Walk walkToFind = new Walk();
+            _mapper.Map(walkToUpdateDTO, walkToFind);
+
+            walkToFind = await _walkRepository.UpdateWalkAsync(id, walkToFind);
+            if (walkToFind == null)
+            {
+                return NotFound();
+            }
+
+            WalkDTO walkDTOreturn = new WalkDTO();
+            _mapper.Map(walkToFind, walkDTOreturn);
+            //_mapper.Map(walkToFind.Difficulty, walkDTOreturn.Difficulty);
+            //_mapper.Map(walkToFind.Region, walkDTOreturn.Region);
+
+            return Ok(walkDTOreturn);
+        }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> DeleteWalk(Guid id)
+        {
+            Walk walkToDelete = await _walkRepository.DeleteWalkAsync(id);
+
+            if (walkToDelete == null)
+            {
+                return NotFound();
+            }
+
+            WalkDTO walkDeletedDTOreturn = new WalkDTO();
+            _mapper.Map(walkToDelete, walkDeletedDTOreturn);
+            //_mapper.Map(walkToDelete.Difficulty, walkDeletedDTOreturn.Difficulty);
+            //_mapper.Map(walkToDelete.Region, walkDeletedDTOreturn.Region);
+
+            return Ok(walkDeletedDTOreturn);
+        }
+    }
+}

@@ -1,0 +1,257 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NZWalks.API.Data;
+using NZWalks.API.Models.Domain;
+using NZWalks.API.Models.DTO;
+using NZWalks.API.OtherFunctions;
+using NZWalks.API.Repositories;
+
+namespace NZWalks.API.Controllers
+{
+    // https://localhost:1234/api/regions
+    [Route("api/[controller]")]
+    [ApiController]
+    public class RegionsController : ControllerBase
+    {
+        private readonly NZWalksDbContext _dbContext;
+        private readonly IRegionRepository _regionRepository;
+
+        public RegionsController(NZWalksDbContext dbContextVar, IRegionRepository regionRepositoryVar)
+        {
+            this._dbContext = dbContextVar;
+            this._regionRepository = regionRepositoryVar;
+        }
+
+        //IActionResult = The response type! Like 400, 200 etc
+        // GET ALL REGIONS
+        // GET: https://localhost:1234/api/regions
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            /*List<Region> regions = new List<Region>
+            {
+                new Region
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Natal Region",
+                    Code = "NTL",
+                    RegionImageUrl = "https://www.praiasdenatal.com.br/wp-content/uploads/2014/08/Natal-RN1.jpg",
+                },
+
+                new Region
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "João Pessoa Region",
+                    Code = "JP",
+                    RegionImageUrl = "https://s2.glbimg.com/M4O9Intlf0DcMPZ_3Dzbs2SM3Ag=/620x466/smart/e.glbimg.com/og/ed/f/original/2021/04/30/joao-pessoa-centro-historico.jpg",
+                },
+
+                new Region
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Recife Region",
+                    Code = "REC",
+                    RegionImageUrl = "https://meulugar.quintoandar.com.br/wp-content/uploads/2023/01/morar-em-recife-4-1-850x680.jpg",
+                },
+            };*/
+
+            // Get data from database - Domain models
+            //List<Region> regionsDomain = await _dbContext.Regions.ToListAsync();
+            List<Region> regionsDomain = await _regionRepository.GetAllAsync();
+
+            // Map domain models to DTOs
+            List<RegionDTO> regionsDTO = new List<RegionDTO>();
+
+            for (int i = 0; i < regionsDomain.Count; ++i)
+            {
+                regionsDTO.Add(new RegionDTO());
+                regionsDTO[i].Id = regionsDomain[i].Id;
+                regionsDTO[i].Code = regionsDomain[i].Code;
+                regionsDTO[i].Name = regionsDomain[i].Name;
+                regionsDTO[i].RegionImageUrl = regionsDomain[i].RegionImageUrl;
+            }
+
+            // Return DTOs
+            return Ok(regionsDTO);
+        }
+
+        // GET SINGLE REGION (Get Region By ID)
+        // GET: https://localhost:1234/api/regions/{id}
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetRegionById([FromRoute] Guid id)
+        {
+            //List<Region> regionsDomain = _dbContext.Regions.ToList();
+            Region regionToFind = new Region();
+            //int i;
+            //OtherFunctionsToUse otherFunctions = new OtherFunctionsToUse();
+            //bool idsAreEqual = false;
+
+            //Console.WriteLine(id);
+
+            /*for (i = 0; i < regionsDomain.Count; ++i)
+            {
+                //if (regions[i].Id == regionId)
+                //if (regionToFind.Id.CompareTo(id) == 0)
+                //{
+                    //break;
+                //}
+                if (otherFunctions.CompareGuids(regionsDomain[i].Id, id))
+                {
+                    idsAreEqual = true;
+                    regionToFind = regionsDomain[i];
+                    break;
+                    //return Ok(regionToFind);
+                }
+            }*/
+
+            //dynamic regions = regionsDomain;
+
+            //regionToFind = regionToFind.SearchReturnRegion(regionsDomain, id);
+            //regionToFind = await _dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            regionToFind = await _regionRepository.GetRegionByIdAsync(id);
+
+            /*if (idsAreEqual == false)
+            {
+                //regionToFind = null;
+                return NotFound();
+            }*/
+            if (regionToFind == null)
+            {
+                return NotFound();
+            }
+
+            // Map/Convert Region Domain model to Region DTO
+            RegionDTO regionDTOtoReturn = new RegionDTO();
+            regionDTOtoReturn.Id = regionToFind.Id;
+            regionDTOtoReturn.Code = regionToFind.Code;
+            regionDTOtoReturn.Name = regionToFind.Name;
+            regionDTOtoReturn.RegionImageUrl = regionToFind.RegionImageUrl;
+
+            // var region = dbContext.Regions.Find(id);
+            // var region = dbContext.Region.FirstOrDefault(x => x.Id == id);
+
+            // Return DTO back to client
+            return Ok(regionDTOtoReturn);
+        }
+
+        // POST To Create new Region
+        // POST: https://localhost:1234/api/regions
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] AddRegionRequestDTO addRegionRequestDTOvar) // In a Post method, we receive a Body from the client
+        {
+            // Map or convert DTO to Domain Model
+            Region regionDomainModel = new Region
+            {
+                Code = addRegionRequestDTOvar.Code,
+                Name = addRegionRequestDTOvar.Name,
+                RegionImageUrl = addRegionRequestDTOvar.RegionImageUrl,
+                //Id = new Guid(),
+            };
+
+            // Use Domain Model to create Region
+            //await _dbContext.Regions.AddAsync(regionDomainModel);
+            //await _dbContext.SaveChangesAsync();
+            regionDomainModel = await _regionRepository.CreateRegionAsync(regionDomainModel);
+            // We need to return this because the function creates an id for regionDomainModel!
+
+            // Map Domain model back to DTO in order not to expose the data to the user
+            RegionDTO regionDTOreturn = new RegionDTO()
+            {
+                Id = regionDomainModel.Id,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+            };
+
+            //return CreatedAtAction
+            string actionNameParam = nameof(GetRegionById);
+            return CreatedAtAction(actionNameParam, new { id = regionDTOreturn.Id}, regionDTOreturn);
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateRegion([FromRoute] Guid id, [FromBody] UpdateRegionRequestDTO regionToUpdateDTO)
+        {
+            //List<Region> regionsDomain = _dbContext.Regions.ToList();
+            //Region regionToFind = new Region();
+            //int i;
+            //OtherFunctionsToUse otherFunctions = new OtherFunctionsToUse();
+
+            //regionToFind = regionToFind.SearchReturnRegion(regionsDomain, id);
+            //regionToFind = await _dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+
+            // Map DTO to domain model
+            Region regionToFind = new Region();
+            regionToFind.Code = regionToUpdateDTO.Code;
+            regionToFind.Name = regionToUpdateDTO.Name;
+            regionToFind.RegionImageUrl = regionToUpdateDTO.RegionImageUrl;
+
+            // Check if region exists
+            regionToFind = await _regionRepository.UpdateRegionAsync(id, regionToFind);
+
+            if (regionToFind == null)
+            {
+                return NotFound();
+            }
+
+            //regionToFind.Code = regionToUpdate.Code;
+            //regionToFind.Name = regionToUpdate.Name;
+            //regionToFind.RegionImageUrl = regionToUpdate.RegionImageUrl;
+
+            //await _dbContext.Regions.UpdateAsync(regionToFind);
+            //await _dbContext.SaveChangesAsync();
+
+            // Convert Domain Model to DTO
+            RegionDTO regionDTOreturn = new RegionDTO
+            {
+                Id = regionToFind.Id,
+                Code = regionToFind.Code,
+                Name = regionToFind.Name,
+                RegionImageUrl = regionToFind.RegionImageUrl,
+            };
+
+            //string actionNameParam = nameof(GetRegionById);
+            //return CreatedAtAction(actionNameParam, new { id = id}, regionToUpdate);
+            return Ok(regionDTOreturn);
+        }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> DeleteRegion([FromRoute] Guid id)
+        {
+            //List<Region> regionsDomain = _dbContext.Regions.ToList();
+            //Region regionToFind = new Region();
+            //int i;
+            //OtherFunctionsToUse otherFunctions = new OtherFunctionsToUse();
+
+            //regionToFind = regionToFind.SearchReturnRegion(regionsDomain, id);
+            //regionToFind = await _dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+
+            //if (regionToFind == null)
+            //{
+            //return NotFound();
+            //}
+
+            //_dbContext.Regions.Remove(regionToFind);
+            //await _dbContext.SaveChangesAsync();
+            Region regionToFind = await _regionRepository.DeleteRegionAsync(id);
+
+            if (regionToFind == null)
+            {
+                return NotFound();
+            }
+
+            RegionDTO regionDTOreturn = new RegionDTO
+            {
+                Id = regionToFind.Id,
+                Code = regionToFind.Code,
+                Name = regionToFind.Name,
+                RegionImageUrl = regionToFind.RegionImageUrl,
+            };
+
+            return Ok(regionDTOreturn);
+        }
+    }
+}

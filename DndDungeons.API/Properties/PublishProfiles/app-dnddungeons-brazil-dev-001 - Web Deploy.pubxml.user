@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAPlMIxBcmKUGf8qBTLtFuggAAAAACAAAAAAAQZgAAAAEAACAAAABOACl0QxATdU/onC0m2AjuX4lmrwnImwpWj0TSvgEeigAAAAAOgAAAAAIAACAAAADLoEKSINd2URRZH1VJ3WiaxiC1ksLiaSboyINNVBULmIAAAACo0X3x6J2sYAMJHMD0EnodU98dawThpvu8Tma9pteLGI9xQKMsmyZmBF1AEPdmV5WdbvbQXDgzCGnqZr+ywOO6dbLYBPdeGW0s1n3y6xHFbgyQNhbnhMTo8HqmD0ms30dMPyKNu+oq3vS58otkTQH/dtC2pQnR9JF9erCSx2hQPUAAAACJOIB3aPOlzkOmLEb2lwMEEp7453PRkw8neVdAFWYNeWihVPSKiFxUWYH6OgB4fVc53kZScVsqvbSrb+9ydmIG</EncryptedPassword>
+    <History>True|2023-12-24T13:27:35.7836245Z;True|2023-12-24T10:23:39.0041727-03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <EFMigrations Include="DndDungeons.API.Data.DndDungeonsAuthDbContext">
+      <Value>Data Source=sqlserver-dnddungeons-brazil-dev-001.database.windows.net,1433%3bInitial Catalog=sqldb-dnddungeons-brazil-dev-001%3bUser ID=dnddungeonsmanagerantonio%3bPassword=Aobmf39410086161!</Value>
+    </EFMigrations>
+    <EFMigrations Include="DndDungeons.API.Data.DndDungeonsDbContext">
+      <Value>Data Source=sqlserver-dnddungeons-brazil-dev-001.database.windows.net,1433%3bInitial Catalog=sqldb-dnddungeons-brazil-dev-001%3bUser ID=dnddungeonsmanagerantonio%3bPassword=Aobmf39410086161!</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

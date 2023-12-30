@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitemanifest>
+  <IisApp path="C:\Users\anton\Antonio\a_programming\asp_dotnet_udemy\DndDungeons\DndDungeons.API\DndDungeons.API\obj\Release\net8.0\PubTmp\Out\" />
+  <dbfullsql path="C:\Users\anton\Antonio\a_programming\asp_dotnet_udemy\DndDungeons\DndDungeons.API\DndDungeons.API\obj\Release\net8.0\PubTmp\EFSQLScripts\DndDungeons.API.Data.DndDungeonsAuthDbContext.sql" />
+  <dbfullsql path="C:\Users\anton\Antonio\a_programming\asp_dotnet_udemy\DndDungeons\DndDungeons.API\DndDungeons.API\obj\Release\net8.0\PubTmp\EFSQLScripts\DndDungeons.API.Data.DndDungeonsDbContext.sql" />
+</sitemanifest>
